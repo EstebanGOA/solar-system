@@ -150,7 +150,6 @@
     <ClInclude Include="..\src\glfunctions.h" />
     <ClInclude Include="..\src\imageloader.h" />
     <ClInclude Include="..\src\Shader.h" />
-    <ClInclude Include="..\src\tiny_obj_loader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -163,10 +162,14 @@
   <ItemGroup>
     <None Include="..\src\shader.frag" />
     <None Include="..\src\shader.vert" />
+    <None Include="..\src\shader_clouds.frag" />
+    <None Include="..\src\shader_clouds.vert" />
     <None Include="..\src\shader_earth.frag" />
     <None Include="..\src\shader_earth.vert" />
     <None Include="..\src\shader_sky.frag" />
     <None Include="..\src\shader_sky.vert" />
+    <None Include="..\src\shader_sun.frag" />
+    <None Include="..\src\shader_sun.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

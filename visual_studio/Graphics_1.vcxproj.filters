@@ -30,9 +30,6 @@
     <ClInclude Include="..\src\imageloader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tiny_obj_loader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -61,10 +58,22 @@
     <None Include="..\src\shader_sky.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\src\shader_earth.frag">
+    <None Include="..\src\shader_sun.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_sun.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\src\shader_earth.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_earth.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_clouds.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_clouds.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
