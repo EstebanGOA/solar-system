@@ -1,0 +1,37 @@
+#version 330
+ 
+
+
+in vec2 a_uv;
+out vec2 v_uv;
+
+in vec3 a_normal;
+out vec3 v_normal;
+
+in vec3 a_vertex;
+out vec3 v_vertex;
+
+// STEP 2: add a attribute: a_uv and varying v_uv here
+
+
+uniform mat4 u_model;
+uniform mat4 u_projection;
+uniform mat4 u_view;
+
+
+void main()
+{
+
+
+    v_vertex =  (u_model * vec4(a_vertex, 1.0)).xyz;
+    v_normal = a_normal;
+    
+    
+
+
+    gl_Position = u_projection * u_view  * u_model * vec4( a_vertex , 1.0 );
+    v_uv = a_uv;
+    
+
+    
+}
