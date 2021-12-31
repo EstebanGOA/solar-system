@@ -57,6 +57,7 @@ GLfloat planetScale = 0.5f;
 GLuint texture_sun, texture_mercury, texture_venus, texture_earth, texture_moon, texture_mars, texture_juptier, texture_saturn, texture_uranus, texture_neptune;
 GLuint texture_earth_normal;
 GLuint texture_earth_clouds;
+GLuint texture_earth_night;
 GLuint texture_skybox;
 
 // Because all planets use the same obj their are going to have the same number of triangles. 
@@ -76,6 +77,7 @@ typedef struct {
     GLfloat rotation;
     GLfloat spin;
     GLuint texture;
+    GLuint texture_night;
     GLuint normals;
     vec3 position;
     vec3 scale;
@@ -163,7 +165,7 @@ void load()
     createVAO(&skyboxVAO, g_simpleShader_sky);
 
     // Create the VAO where we store all geometry realted to the clouds that we are going to use in the earth
-    createVAO(&cloudsVAO, g_simpleShader_clouds);
+    createVAO(&cloudsVAO, g_simpleShader_earth);
 
     // All planets use the same shape so there is no need for more variables to store triangles
     numberOfTriangles = shapes[0].mesh.indices.size() / 3;
@@ -209,7 +211,9 @@ void load()
 
     Image* earth_clouds = loadBMP("assets/2k_earth_clouds.bmp");
     loadTexture(earth_clouds, &texture_earth_clouds);
-
+      
+    Image* earth_night = loadBMP("assets/earthnight.bmp");
+    loadTexture(earth_night, &texture_earth_night);
 }
 
 void drawSkybox() {
@@ -318,6 +322,12 @@ void drawEarth() {
     // activate shader
     glUseProgram(g_simpleShader_earth);
 
+    // Set alpha
+    GLuint u_clouds = glGetUniformLocation(g_simpleShader_earth, "u_clouds");
+    glUniform1f(u_clouds, 0.0);
+    GLuint u_alpha = glGetUniformLocation(g_simpleShader_earth, "u_alpha");
+    glUniform1f(u_alpha, 1.0);
+
     // SET PROJECTION MATRIX
     GLuint projection_loc = glGetUniformLocation(g_simpleShader_earth, "u_projection");
     mat4 projection_matrix = perspective(
@@ -332,6 +342,8 @@ void drawEarth() {
     // GLuint colorLoc = glGetUniformLocation(g_simpleShader, "u_color"); // Al añadir una textura al objeto no me hace falta añadirle color
     GLuint u_texture = glGetUniformLocation(g_simpleShader_earth, "u_texture");
     GLuint u_texture_normal = glGetUniformLocation(g_simpleShader_earth, "u_texture_normal");
+    // Set texture night.
+    GLuint u_texture_night = glGetUniformLocation(g_simpleShader_earth, "u_texture_night");
 
     // update shader with light values.
     GLuint light_loc = glGetUniformLocation(g_simpleShader_earth, "u_light_dir");
@@ -343,7 +355,7 @@ void drawEarth() {
     GLuint diffuse_loc = glGetUniformLocation(g_simpleShader_earth, "u_diffuse");
     glUniform3f(diffuse_loc, 1.0f, 1.0f, 1.0f);
     GLuint specular_loc = glGetUniformLocation(g_simpleShader_earth, "u_specular");
-    glUniform3f(specular_loc, 1.0f, 1.0f, 1.0f);
+    glUniform3f(specular_loc, 0.5f, 0.5f, 0.5f);
     GLuint shininess_loc = glGetUniformLocation(g_simpleShader_earth, "u_shininess");
     glUniform1f(shininess_loc, 120.0f);
 
@@ -351,9 +363,14 @@ void drawEarth() {
     Planet earth;
     earth.position = vec3(0.0f, 0.0f, -5.0f);
     earth.texture = texture_earth;
+    earth.texture_night = texture_earth_night;
     earth.normals = texture_earth_normal;
 
     // Draw planets
+    glUniform1i(u_texture_night, 2);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, earth.texture_night);
+    
     drawPlanetWithNormal(earth, earthVAO, model_loc, u_texture, u_texture_normal);
 
     mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -393,20 +410,22 @@ void drawClouds() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // activate shader
-    glUseProgram(g_simpleShader_clouds);
+    glUseProgram(g_simpleShader_earth);
     
     // Set alpha
-    GLuint u_alpha = glGetUniformLocation(g_simpleShader_clouds, "u_alpha");
+    GLuint u_clouds = glGetUniformLocation(g_simpleShader_earth, "u_clouds");
+    glUniform1f(u_clouds, 1.0);
+    GLuint u_alpha = glGetUniformLocation(g_simpleShader_earth, "u_alpha");
     glUniform1f(u_alpha, 0.8);
 
     // SET MVP
-    GLuint model_loc = glGetUniformLocation(g_simpleShader_clouds, "u_model");
+    GLuint model_loc = glGetUniformLocation(g_simpleShader_earth, "u_model");
 
     mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-    GLuint view_loc = glGetUniformLocation(g_simpleShader_clouds, "u_view");
+    GLuint view_loc = glGetUniformLocation(g_simpleShader_earth, "u_view");
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
-    GLuint projection_loc = glGetUniformLocation(g_simpleShader_clouds, "u_projection");
+    GLuint projection_loc = glGetUniformLocation(g_simpleShader_earth, "u_projection");
     mat4 projection_matrix = perspective(
         90.0f,      // Field of view
         ((float)g_ViewportWidth / (float)g_ViewportHeight),       // Aspect ratio
@@ -422,7 +441,7 @@ void drawClouds() {
     clouds.scale = vec3(1.02f, 1.02f, 1.02f);
 
     // Draw planets
-    GLuint u_texture = glGetUniformLocation(g_simpleShader_clouds, "u_texture");
+    GLuint u_texture = glGetUniformLocation(g_simpleShader_earth, "u_texture");
 
     /*
     GLuint u_texture_transparency = glGetUniformLocation(g_simpleShader_clouds, "u_texture_transparency");
@@ -445,6 +464,12 @@ void drawPlanets() {
    
     // activate shader
     glUseProgram(g_simpleShader);
+
+    // Set alpha
+    GLuint u_clouds = glGetUniformLocation(g_simpleShader, "u_clouds");
+    glUniform1f(u_clouds, 0.0);
+    GLuint u_alpha = glGetUniformLocation(g_simpleShader, "u_alpha");
+    glUniform1f(u_alpha, 1.0);
 
     // SET PROJECTION MATRIX
     GLuint projection_loc = glGetUniformLocation(g_simpleShader, "u_projection");

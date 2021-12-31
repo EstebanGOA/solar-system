@@ -8,7 +8,6 @@ in vec3 v_normal;
 in vec3 v_vertex;
 
 uniform sampler2D u_texture;
-uniform vec3 u_color;
 
 // Variables to represet light
 uniform vec3 u_light_dir;

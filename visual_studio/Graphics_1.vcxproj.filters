@@ -70,11 +70,5 @@
     <None Include="..\src\shader_earth.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\src\shader_clouds.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\src\shader_clouds.vert">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

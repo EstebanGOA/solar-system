@@ -7,8 +7,15 @@ in vec2 v_uv;
 in vec3 v_normal; 
 in vec3 v_vertex;
 
+// Values to assign textures
 uniform sampler2D u_texture;
-uniform vec3 u_color;
+
+// Values to assign night textures;
+uniform sampler2D u_texture_night;
+
+// Values to set alpha on different planets
+uniform float u_alpha;
+uniform float u_clouds;
 
 // Variables to represet light
 uniform vec3 u_light_dir;
@@ -65,7 +72,21 @@ void main(void)
     float RdotE = max(dot(R, E), 0.0);
 
     vec4 texture_color = texture(u_texture, v_uv);
+	vec4 texture_night = texture(u_texture_night, v_uv);
+
     vec3 final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);
-    fragColor =  vec4(final_color, 1.0);
     
+	// Si u_clouds es 1.0 estamos dibujando las nubes del planeta, por tanto, descartamos las partes de la textura que tengan un color cercano al negro.
+	if ( u_clouds == 0.0 ) {
+		if ( final_color.x <= 0.09 && final_color.y <= 0.09 && final_color.z <= 0.09 ) {
+			fragColor = vec4(texture_night.xyz, u_alpha);
+		} else {
+			fragColor = vec4(final_color, u_alpha);
+		}
+	} else {
+		if ( texture_color.x <= 0.3 && texture_color.y <= 0.3 && texture_color.z <= 0.3 ) discard;
+		// Modificando el u_alpha podemos hacer que la textura sea más o menos transparente. 
+		fragColor =  vec4(final_color, u_alpha);
+	}
+
 }
