@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\glfunctions.h" />
     <ClInclude Include="..\src\imageloader.h" />
+    <ClInclude Include="..\src\Line.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\glfunctions.cpp" />
     <ClCompile Include="..\src\imageloader.cpp" />
+    <ClCompile Include="..\src\Line.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
   </ItemGroup>
@@ -164,6 +166,8 @@
     <None Include="..\src\shader.vert" />
     <None Include="..\src\shader_earth.frag" />
     <None Include="..\src\shader_earth.vert" />
+    <None Include="..\src\shader_line.frag" />
+    <None Include="..\src\shader_line.vert" />
     <None Include="..\src\shader_sky.frag" />
     <None Include="..\src\shader_sky.vert" />
     <None Include="..\src\shader_sun.frag" />

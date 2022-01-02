@@ -23,6 +23,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
+#include "Line.h";
+
 using namespace std;
 using namespace glm;
 
@@ -42,6 +44,7 @@ GLuint g_simpleShader_sky = 0; // skybox shader identifier
 GLuint g_simpleShader_earth = 0;
 GLuint g_simpleShader_sun = 0;
 GLuint g_simpleShader_clouds = 0;
+GLuint g_simpleShader_lines = 0;
 
 // Global values for the skybox
 GLuint skyboxVAO = 0; // vao for the skybox
@@ -51,6 +54,7 @@ vec3 eye = vec3(0.0f, 0.0f, 0.0f);
 // Global values for the planets
 GLuint sunVAO = 0, mercuryVAO = 0, venusVAO = 0, earthVAO = 0, moonVAO = 0, marsVAO = 0, saturnVAO = 0, uranusVAO = 0, neptuneVAO = 0;
 GLuint cloudsVAO = 0;
+GLuint linesVAO = 0;
 GLfloat planetScale = 0.5f;
 
 //STEP 6: add a global variable for the texture ID
@@ -62,6 +66,7 @@ GLuint texture_skybox;
 
 // Because all planets use the same obj their are going to have the same number of triangles. 
 GLuint numberOfTriangles = 0; //  Numbre of triangles we are painting.
+GLuint numberOfLines = 0;
 
 // View Matrix
 vec3 cameraPos = vec3(0.0f, 0.0f, 3.0f);
@@ -149,6 +154,9 @@ void load()
     // Shader for the clouds (because of transparency) 
     Shader simpleCloudsShader("src/shader_clouds.vert", "src/shader_clouds.frag");
     g_simpleShader_clouds = simpleCloudsShader.program;
+
+    Shader simpleLinesShader("src/shader_line.vert", "src/shader_line.frag");
+    g_simpleShader_lines = simpleLinesShader.program;
 
     // Create the VAOs where we store all geometry realted to the planets
     createVAO(&sunVAO, g_simpleShader_sun);
@@ -557,6 +565,71 @@ void drawPlanets() {
 
 }
 
+void drawLines() {
+
+    // SET MVP
+    mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    mat4 projection_matrix = perspective(
+        90.0f,      // Field of view
+        ((float)g_ViewportWidth / (float)g_ViewportHeight),       // Aspect ratio
+        0.1f,       // Near plane (distance from camera)
+        50.0f       // Far plane (distance from camera)
+    );
+
+    Line line(vec3(0.0f, 0.0f, 0.0f), vec3(10.0f, 10.0f, 10.0f));
+    line.setMVP(projection_matrix * view_matrix);
+    line.draw();
+
+    /* 
+    // STEP 4: add depth test
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    // activate shader
+    glUseProgram(g_simpleShader_lines);
+
+    // SET MVP
+    GLuint model_loc = glGetUniformLocation(g_simpleShader_lines, "u_model");
+
+    mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    GLuint view_loc = glGetUniformLocation(g_simpleShader_lines, "u_view");
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view_matrix));
+
+    GLuint projection_loc = glGetUniformLocation(g_simpleShader_lines, "u_projection");
+    mat4 projection_matrix = perspective(
+        90.0f,      // Field of view
+        ((float)g_ViewportWidth / (float)g_ViewportHeight),       // Aspect ratio
+        0.1f,       // Near plane (distance from camera)
+        50.0f       // Far plane (distance from camera)
+    );
+    glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection_matrix));
+
+    // Pass data to shader
+    GLuint color_loc = glGetUniformLocation(g_simpleShader_lines, "u_color");
+    glUniform3f(color_loc, 1.0f, 1.0f, 0.0f);
+
+    vector<GLfloat> vertices = {
+        1.0f, 1.0f, 1.0f,
+        20.0f, 20.0f, 20.0f,
+    };
+
+    linesVAO = gl_createAndBindVAO();
+    // Bind the vectors/arrays to the attributes in the shaders
+    gl_createAndBindAttribute(&(vertices[0]), vertices[0] * sizeof(float), g_simpleShader_lines, "a_vertex", 3);
+    gl_unbindVAO();
+
+    numberOfLines = vertices.size() / 3;
+
+    mat4 model = translate(mat4(1.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+
+    glDrawElements(GL_TRIANGLES, 3 * numberOfLines, GL_UNSIGNED_INT, 0);
+    */
+
+}
+
 // ------------------------------------------------------------------------------------------
 // This function actually draws to screen and called non-stop, in a loop
 // ------------------------------------------------------------------------------------------
@@ -570,6 +643,7 @@ void draw()
     drawEarth();
     drawClouds();
     drawPlanets();
+    drawLines();
 
 }
 
