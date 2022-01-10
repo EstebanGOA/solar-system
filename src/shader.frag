@@ -59,6 +59,23 @@ void main(void)
 	float NdotL = max(dot(N, L), 0.0);
     float RdotE = max(dot(R, E), 0.0);
 
+
+
+
+	/*	
+	float spec = 0.50f;
+	vec3 halfwayDir = normalize(E + L);
+
+
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), u_shininess);
+	vec3 specular = lightColor * spec;
+
+	*/
+
+
+
+
+
     vec4 texture_color = texture(u_texture, v_uv);
 
     vec3 final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);

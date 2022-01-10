@@ -82,5 +82,29 @@
     <None Include="..\src\shader_line.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shader_sky.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shader_sky.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_circle.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_circle.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_ring.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_ring.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_rock.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shader_rock.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
