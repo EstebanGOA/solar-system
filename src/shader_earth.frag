@@ -13,6 +13,8 @@ uniform sampler2D u_texture;
 // Values to assign night textures;
 uniform sampler2D u_texture_night;
 
+uniform sampler2D u_texture_specular;
+
 // Values to set alpha on different planets
 uniform float u_alpha;
 uniform float u_clouds;
@@ -74,10 +76,15 @@ void main(void)
     vec4 texture_color = texture(u_texture, v_uv);
 	vec4 texture_night = texture(u_texture_night, v_uv);
 
+	vec4 texture_specular = texture(u_texture_specular, v_uv);
+	vec3 final_color;
+	if( texture_specular.x > 0.5 && texture_specular.y > 0.5 && texture_specular.z > 0.5){
+     final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);
+    }
+	else{
+	final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL ;
 
-
-    vec3 final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);
-    
+	}
 	// Si u_clouds es 1.0 estamos dibujando las nubes del planeta, por tanto, descartamos las partes de la textura que tengan un color cercano al negro.
 	if ( u_clouds == 0.0 ) {
 		if ( final_color.x <= 0.09 && final_color.y <= 0.09 && final_color.z <= 0.09 ) {

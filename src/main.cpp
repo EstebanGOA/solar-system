@@ -77,6 +77,7 @@ GLuint texture_sun, texture_mercury, texture_venus, texture_earth, texture_moon,
 GLuint texture_earth_normal;
 GLuint texture_earth_clouds;
 GLuint texture_earth_night;
+GLuint texture_earth_spec;
 GLuint texture_skybox;
 GLuint texture_line;
 GLuint texture_ring;
@@ -104,6 +105,7 @@ typedef struct {
     GLuint texture;
     GLuint texture_night;
     GLuint normals;
+    GLuint specular;
     vec3 position;
     vec3 scale;
     GLfloat orbit;
@@ -248,7 +250,8 @@ void load()
     createVAO(&marsLineVAO, g_simpleShader_circle);
     createVAO(&jupiterLineVAO, g_simpleShader_circle);
     createVAO(&saturnLineVAO, g_simpleShader_circle);
-    createVAO(&neptuneVAO, g_simpleShader_circle);
+    createVAO(&uranusLineVAO, g_simpleShader_circle);
+    createVAO(&neptuneLineVAO, g_simpleShader_circle);
 
     // Create the VAO where we store all geometry realted to the skybox
     createVAO(&skyboxVAO, g_simpleShader_sky);
@@ -316,12 +319,16 @@ void load()
     Image* ring = loadBMP("assets/saturn_rings.bmp");
     loadTexture(ring, &texture_ring);
 
+    Image* earth_specular = loadBMP("assets/earthspec.bmp");
+    loadTexture(earth_specular, &texture_earth_spec);
+
     // Earth
     earth.position = vec3(16.0f, 16.0f, 0.0f);
     earth.scale = vec3(0.5f, 0.5f, 0.5f);
     earth.texture = texture_earth;
     earth.texture_night = texture_earth_night;
     earth.normals = texture_earth_normal;
+    earth.specular = texture_earth_spec;
     earth.orbit = 169.0f;
 
     // Sun
@@ -357,19 +364,19 @@ void load()
     // Jupiter
     jupiter.position = vec3(25.0f, 25.0f, 0.0f);
     jupiter.texture = texture_jupiter;
-    jupiter.scale = earth.scale * 4.19f;
+    jupiter.scale = earth.scale * 5.40f;
     jupiter.orbit = 181.0f;
 
     // Saturn
     saturn.position = vec3(35.0f, 35.0f, 0.0f);
     saturn.texture = texture_saturn;
-    saturn.scale = earth.scale * 5.40f;
+    saturn.scale = earth.scale * 4.19f;
     saturn.orbit = 17.0f;
 
     // Uranus
     uranus.position = vec3(45.0f, 45.0f, 0.0f);
     uranus.texture = texture_uranus;
-    uranus.scale = earth.scale * 5.04f;
+    uranus.scale = earth.scale * 3.04f;
     uranus.orbit = 45.0f;
 
     // Neptune
@@ -490,6 +497,7 @@ void drawPlanetWithNormal(Planet &planet, Planet &around, GLuint VAO, GLuint mod
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, planet.normals);
 
+
     glUniform1i(u_texture, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, planet.texture);
@@ -529,6 +537,9 @@ void drawEarth() {
     GLuint u_texture_normal = glGetUniformLocation(g_simpleShader_earth, "u_texture_normal");
     // Set texture night.
     GLuint u_texture_night = glGetUniformLocation(g_simpleShader_earth, "u_texture_night");
+    // Set specular 
+    GLuint u_texture_specular = glGetUniformLocation(g_simpleShader_earth, "u_texture_specular");
+
 
     // update shader with light values.
     GLuint light_loc = glGetUniformLocation(g_simpleShader_earth, "u_light_dir");
@@ -548,6 +559,10 @@ void drawEarth() {
     glUniform1i(u_texture_night, 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, earth.texture_night);
+
+    glUniform1i(u_texture_specular, 3);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, earth.specular);
     
     drawPlanetWithNormal(earth, sun, earthVAO, model_loc, u_texture, u_texture_normal);
 
@@ -689,9 +704,10 @@ void drawPlanets() {
     drawPlanet(moon, earth, moonVAO, model_loc, u_texture);
     drawPlanet(mars, sun, marsVAO, model_loc, u_texture);
     drawPlanet(jupiter, sun, jupiterVAO, model_loc, u_texture);
-    drawPlanet(neptune, sun, neptuneVAO, model_loc, u_texture);
     drawPlanet(saturn, sun, saturnVAO, model_loc, u_texture);
     drawPlanet(uranus, sun, uranusVAO, model_loc, u_texture);
+    drawPlanet(neptune, sun, neptuneVAO, model_loc, u_texture);
+
 
     mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     GLuint view_loc = glGetUniformLocation(g_simpleShader, "u_view");
@@ -798,10 +814,10 @@ void drawRings() {
 
     gl_bindVAO(ringVAO);
 
-    GLfloat jupiter_x = jupiter.position.x * cos(jupiter.orbit / 180 * glm::pi<float>());
-    GLfloat jupiter_y = jupiter.position.y * sin(jupiter.orbit / 180 * glm::pi<float>());
+    GLfloat saturn_x = saturn.position.x * cos(saturn.orbit / 180 * glm::pi<float>());
+    GLfloat saturn_y = saturn.position.y * sin(saturn.orbit / 180 * glm::pi<float>());
 
-    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(jupiter_x, jupiter_y, 0.0f)) * rotate(mat4(1.0), 45.0f, vec3(1.0f, 0.0f, 0.0f)) * scale(mat4(1.0), ring.scale);
+    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(saturn_x, saturn_y, 0.0f)) * rotate(mat4(1.0), 45.0f, vec3(1.0f, 0.0f, 0.0f)) * scale(mat4(1.0), ring.scale);
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
    
@@ -828,6 +844,7 @@ void draw()
     drawPlanets();
     drawLines();
     drawRings();
+    
 
 }
 
