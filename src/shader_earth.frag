@@ -99,5 +99,5 @@ void main(void)
 		// Modificando el u_alpha podemos hacer que la textura sea más o menos transparente. 
 		fragColor =  vec4(final_color, u_alpha);
 	}
-
+    
 }

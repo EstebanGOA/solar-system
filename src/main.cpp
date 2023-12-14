@@ -474,7 +474,7 @@ void drawSun() {
     );
     glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection_matrix));
 
-   
+
     gl_bindVAO(sunVAO);
 
     mat4 model = translate(mat4(1.0f), sun.position) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), sun.scale);
@@ -569,7 +569,7 @@ void drawEarth() {
     GLuint shininess_loc = glGetUniformLocation(g_simpleShader_earth, "u_shininess");
     glUniform1f(shininess_loc, 120.0f);
 
-    
+
     glUniform1i(u_texture_night, 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, earth.texture_night);
@@ -589,7 +589,7 @@ void drawEarth() {
 void drawPlanet(Planet &planet, Planet &around, GLuint VAO, GLuint model_loc, GLuint u_texture) {
 
     gl_bindVAO(VAO);
-
+    
     GLfloat around_x = around.position.x * cos(around.orbit / 180 * glm::pi<float>());
     GLfloat around_y = around.position.y * sin(around.orbit / 180 * glm::pi<float>());
 
@@ -710,7 +710,7 @@ void drawPlanets() {
     glUniform3f(specular_loc, 1.0f, 1.0f, 1.0f);
     GLuint shininess_loc = glGetUniformLocation(g_simpleShader, "u_shininess");
     glUniform1f(shininess_loc, 120.0f);
-     
+    
     // Draw plaents without normals (bumps)
     drawPlanet(mercury, sun, mercuryVAO, model_loc, u_texture);
     drawPlanet(venus, sun, venusVAO, model_loc, u_texture);
@@ -768,7 +768,7 @@ void drawLines() {
     mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     GLuint view_loc = glGetUniformLocation(g_simpleShader_circle, "u_view");
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view_matrix));
-
+    
     GLuint projection_loc = glGetUniformLocation(g_simpleShader_circle, "u_projection");
     mat4 projection_matrix = perspective(
         90.0f,      // Field of view
@@ -780,7 +780,7 @@ void drawLines() {
 
     // Draw planets
     GLuint u_texture = glGetUniformLocation(g_simpleShader_circle, "u_texture");
-
+    
     drawLine(mercury, sun, mercuryLineVAO, model_loc, u_texture);
     drawLine(venus, sun, venusLineVAO, model_loc, u_texture);
     drawLine(earth, sun, earthLineVAO, model_loc, u_texture);
@@ -798,10 +798,10 @@ void drawRings() {
     // STEP 4: add depth test
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-  
+
     // activate shader
     glUseProgram(g_simpleShader_ring);
-
+    
     // SET MVP
     GLuint model_loc = glGetUniformLocation(g_simpleShader_ring, "u_model");
 
@@ -950,7 +950,7 @@ int main(void)
     {
 
         draw();
-
+        
         // Swap front and back buffers
         glfwSwapBuffers(window);
         
