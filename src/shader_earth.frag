@@ -78,6 +78,8 @@ void main(void)
 
 	vec4 texture_specular = texture(u_texture_specular, v_uv);
 	vec3 final_color;
+
+	// Specular Map
 	if( texture_specular.x > 0.5 && texture_specular.y > 0.5 && texture_specular.z > 0.5){
      final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);
     }

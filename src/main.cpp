@@ -1,5 +1,3 @@
-/*  by Alun Evans 2016 LaSalle (aevanss@salleurl.edu) */
-
 //include some standard libraries
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//STEP 5: INCLUDE THE imageloader
+//INCLUDE THE imageloader
 #include "imageloader.h"
 
 //include some custom code files
@@ -23,15 +21,15 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-#include "Line.h";
 
 using namespace std;
 using namespace glm;
 
+
 const char filename[] = "assets/sphere.obj";
-vector <tinyobj::shape_t> shapes;
-vector <tinyobj::shape_t> shapes2;
-vector <tinyobj::shape_t> shapes3;
+vector <tinyobj::shape_t> shapes;   // Shape sphere
+vector <tinyobj::shape_t> shapes2;  // Shape plane
+vector <tinyobj::shape_t> shapes3;  // Shape asteroid
 
 
 
@@ -44,15 +42,14 @@ const vec3 g_backgroundColor(0.2f, 0.2f, 0.2f); // background colour - a GLM 3-c
 //global variables related to lights
 vec3 g_light_dir(0.0, 0.0, 0.0);
 
-GLuint g_simpleShader = 0; //shader identifier
-GLuint g_simpleShader_sky = 0; // skybox shader identifier
-GLuint g_simpleShader_earth = 0;
-GLuint g_simpleShader_sun = 0;
-GLuint g_simpleShader_clouds = 0;
-GLuint g_simpleShader_lines = 0;
-GLuint g_simpleShader_circle = 0;
-GLuint g_simpleShader_ring = 0;
-GLuint g_simpleShader_rock = 0;
+GLuint g_simpleShader = 0;          //shader identifier
+GLuint g_simpleShader_sky = 0;      // skybox shader identifier
+GLuint g_simpleShader_earth = 0;    // earth shader identifier
+GLuint g_simpleShader_sun = 0;      // sun shader identifier
+GLuint g_simpleShader_clouds = 0;   // clouds shader identifier
+GLuint g_simpleShader_circle = 0;   // circle shader identifier
+GLuint g_simpleShader_ring = 0;     // ring shader identifier
+GLuint g_simpleShader_rock = 0;     // rock shader identifier
 
 // Global values for the skybox
 GLuint skyboxVAO = 0; // vao for the skybox
@@ -70,9 +67,10 @@ GLuint mercuryLineVAO = 0, venusLineVAO = 0, earthLineVAO = 0, moonLineVAO = 0, 
 // VAO for the rings of jupiter
 GLuint ringVAO = 0;
 
+// VAO for the rock/asteroid
 GLuint rockVAO = 0;
 
-//STEP 6: add a global variable for the texture ID
+// Add a global variables for the textures IDs
 GLuint texture_sun, texture_mercury, texture_venus, texture_earth, texture_moon, texture_mars, texture_jupiter, texture_saturn, texture_uranus, texture_neptune;
 GLuint texture_earth_normal;
 GLuint texture_earth_clouds;
@@ -83,10 +81,11 @@ GLuint texture_line;
 GLuint texture_ring;
 
 // Because all planets use the same obj their are going to have the same number of triangles. 
-GLuint numberOfTriangles = 0; //  Numbre of triangles we are painting.
-GLuint numberOfLines = 0;
+GLuint numberOfTriangles = 0;   //  Number of triangles we are painting.
 
-GLuint numberOfTriangles2 = 0;
+// Plane triangles
+GLuint numberOfTriangles2 = 0;  
+// Rock triangles
 GLuint numberOfTriangles3 = 0;
 
 // View Matrix
@@ -126,7 +125,9 @@ Planet neptune;
 Planet clouds;
 Planet rock;
 
-
+/*
+* This function creates the VAO for the sphere and binds it 
+*/
 void createVAO(GLuint *VAO, GLuint shader) {
     *VAO = gl_createAndBindVAO();
     // Bind the vectors/arrays to the attributes in the shaders
@@ -137,6 +138,9 @@ void createVAO(GLuint *VAO, GLuint shader) {
     gl_unbindVAO();
 }
 
+/*
+* This function creates the VAO for the plane and binds it
+*/
 void createVAO2(GLuint* VAO, GLuint shader) {
     *VAO = gl_createAndBindVAO();
     // Bind the vectors/arrays to the attributes in the shaders
@@ -147,6 +151,9 @@ void createVAO2(GLuint* VAO, GLuint shader) {
     gl_unbindVAO();
 }
 
+/*
+* This function creates the VAO for the rock and binds it
+*/
 void createVAO3(GLuint* VAO, GLuint shader) {
     *VAO = gl_createAndBindVAO();
     // Bind the vectors/arrays to the attributes in the shaders
@@ -157,6 +164,9 @@ void createVAO3(GLuint* VAO, GLuint shader) {
     gl_unbindVAO();
 }
 
+/*
+* This function loads all the textures
+*/
 void loadTexture(Image *image, GLuint *texture) {
     glGenTextures(1, texture);
     glBindTexture(GL_TEXTURE_2D, *texture);
@@ -216,16 +226,16 @@ void load()
     // Shader for the clouds (because of transparency) 
     Shader simpleCloudsShader("src/shader_clouds.vert", "src/shader_clouds.frag");
     g_simpleShader_clouds = simpleCloudsShader.program;
-
-    Shader simpleLinesShader("src/shader_line.vert", "src/shader_line.frag");
-    g_simpleShader_lines = simpleLinesShader.program;
     
+    // Shader for the circle
     Shader simpleCircleShader("src/shader_circle.vert", "src/shader_circle.frag");
     g_simpleShader_circle = simpleCircleShader.program;
 
+    // Shader for the saturn rings
     Shader simpleSaturnRingShader("src/shader_ring.vert", "src/shader_ring.frag");
     g_simpleShader_ring = simpleSaturnRingShader.program;
 
+    // Shader for the rock
     Shader simpleRockShader("src/shader_rock.vert", "src/shader_rock.frag");
     g_simpleShader_rock = simpleRockShader.program;
     
@@ -307,18 +317,23 @@ void load()
     Image* earth_normal = loadBMP("assets/earthnormal.bmp");
     loadTexture(earth_normal, &texture_earth_normal);
 
+    // Create the texture object for the clouds
     Image* earth_clouds = loadBMP("assets/2k_earth_clouds.bmp");
     loadTexture(earth_clouds, &texture_earth_clouds);
       
+    // Create the texture object for the earth night texture
     Image* earth_night = loadBMP("assets/earthnight.bmp");
     loadTexture(earth_night, &texture_earth_night);
 
+    // Create the texture object for the circle
     Image* line = loadBMP("assets/circle.bmp");
     loadTexture(line, &texture_line);
 
+    // Create the texture object for the ring
     Image* ring = loadBMP("assets/saturn_rings.bmp");
     loadTexture(ring, &texture_ring);
 
+    // Create the texture object for the earth specular map
     Image* earth_specular = loadBMP("assets/earthspec.bmp");
     loadTexture(earth_specular, &texture_earth_spec);
 
@@ -392,7 +407,7 @@ void load()
     clouds.orbit = earth.orbit;
 
     // Rock
-    rock.position = vec3(2.0, 2.0f, 2.0f);
+    rock.position = vec3(10.0, 10.0f, 5.0f);
     rock.texture = texture_moon;
     rock.scale = vec3(0.0007f, 0.0007f, 0.0007f);
     rock.orbit = 5.0f;
@@ -462,7 +477,7 @@ void drawSun() {
    
     gl_bindVAO(sunVAO);
 
-    mat4 model = translate(mat4(1.0f), sun.position) * scale(mat4(1.0f), sun.scale);
+    mat4 model = translate(mat4(1.0f), sun.position) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), sun.scale);
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
     GLuint u_texture = glGetUniformLocation(g_simpleShader_sun, "u_texture");
@@ -489,8 +504,7 @@ void drawPlanetWithNormal(Planet &planet, Planet &around, GLuint VAO, GLuint mod
         planet.orbit = 0;
 
 
-    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(planet_x, planet_y, 0.0f)) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), planet.scale);;
-
+    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(planet_x, planet_y, 0.0f)) * rotate(mat4(1.0), -90.0f, vec3(1.0f, 0.0f, 0.0f)) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), planet.scale);
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
     glUniform1i(u_texture_normal, 1);
@@ -507,7 +521,7 @@ void drawPlanetWithNormal(Planet &planet, Planet &around, GLuint VAO, GLuint mod
 
 void drawEarth() {
     
-    // STEP 4: add depth test
+    // add depth test
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -555,7 +569,7 @@ void drawEarth() {
     GLuint shininess_loc = glGetUniformLocation(g_simpleShader_earth, "u_shininess");
     glUniform1f(shininess_loc, 120.0f);
 
-    // Draw planets
+    
     glUniform1i(u_texture_night, 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, earth.texture_night);
@@ -588,8 +602,7 @@ void drawPlanet(Planet &planet, Planet &around, GLuint VAO, GLuint model_loc, GL
     if (planet.orbit > 360)
         planet.orbit = 0;
 
-    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(planet_x, planet_y, 0.0f)) * rotate(mat4(1.0), ((float)glfwGetTime() * 10.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0), planet.scale);
-    
+    mat4 model = rotate(mat4(1.0), 90.0f, vec3(1.0f, 0.0f, 0.0f)) * translate(mat4(1.0f), vec3(planet_x, planet_y, 0.0f)) * rotate(mat4(1.0), -90.0f, vec3(1.0f, 0.0f, 0.0f)) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), planet.scale);
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(u_texture, 0);
     glActiveTexture(GL_TEXTURE0);
@@ -598,10 +611,10 @@ void drawPlanet(Planet &planet, Planet &around, GLuint VAO, GLuint model_loc, GL
 
 }
 
-void drawR(Planet planet, GLuint VAO, GLuint model_loc, GLuint u_texture) {
+void drawRock(Planet planet, GLuint VAO, GLuint model_loc, GLuint u_texture) {
 
     gl_bindVAO(VAO);
-    mat4 model = translate(mat4(1.0f), planet.position) * rotate(mat4(1.0), ((float)glfwGetTime() * 3.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0), planet.scale);
+    mat4 model = translate(mat4(1.0f), planet.position) * rotate(mat4(1.0), ((float)glfwGetTime() * 30.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0), planet.scale);
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(u_texture, 0);
@@ -613,7 +626,7 @@ void drawR(Planet planet, GLuint VAO, GLuint model_loc, GLuint u_texture) {
 
 void drawClouds() {
 
-    // STEP 4: add depth test
+    // add depth test
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -707,14 +720,16 @@ void drawPlanets() {
     drawPlanet(saturn, sun, saturnVAO, model_loc, u_texture);
     drawPlanet(uranus, sun, uranusVAO, model_loc, u_texture);
     drawPlanet(neptune, sun, neptuneVAO, model_loc, u_texture);
-
+    drawRock(rock, rockVAO, model_loc, u_texture);
 
     mat4 view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     GLuint view_loc = glGetUniformLocation(g_simpleShader, "u_view");
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
 }
-
+/*
+* This function draws a line in form of a circle of the trajectory of a certain planet
+*/
 void drawLine(Planet planet, Planet around, GLuint VAO, GLuint model_loc, GLuint u_texture) {
 
     gl_bindVAO(VAO);

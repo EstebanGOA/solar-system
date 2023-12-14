@@ -30,9 +30,6 @@
     <ClInclude Include="..\src\imageloader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Line.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -45,9 +42,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\imageloader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,12 +68,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\src\shader_earth.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\src\shader_line.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\src\shader_line.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shader_sky.frag">

@@ -17,7 +17,7 @@ void main()
 {
     gl_Position = u_projection * u_view * u_model * vec4( a_vertex , 1.0 );
 
-    // STEP 2: pass the uv coordinates to the fragment shader
+    // pass the uv coordinates to the fragment shader
     v_uv = a_uv;
     v_vertex = (u_model * vec4( a_vertex, 1.0 )).xyz; 
     

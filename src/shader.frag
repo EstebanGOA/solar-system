@@ -2,7 +2,6 @@
 
 out vec4 fragColor;
 
-// STEP 3: get the uv coordinates form the vertex shader
 in vec2 v_uv;
 in vec3 v_normal; 
 in vec3 v_vertex;
@@ -50,7 +49,7 @@ vec3 perturbNormal( vec3 N, vec3 V, vec2 texcoord, vec3 normal_pixel )
 
 void main(void)
 {
-
+	// Phong
     vec3 N = normalize(v_normal);
 	vec3 L = normalize(u_light_dir - v_vertex);
     vec3 R = normalize(-reflect(L, N));
@@ -59,17 +58,22 @@ void main(void)
 	float NdotL = max(dot(N, L), 0.0);
     float RdotE = max(dot(R, E), 0.0);
 
-	/*	
+	// Blinn-Phong
+
+	float uspecular = 0.0f;
+	if(NdotL != 0.0){
 	float spec = 0.50f;
 	vec3 halfwayDir = normalize(E + L);
 
+	float specAmount = pow(max(dot(N, halfwayDir), 0.0), 16);
+	float uspecular = specAmount * spec;
+	}
 
-	float spec = pow(max(dot(normal, halfwayDir), 0.0), u_shininess);
-	vec3 specular = lightColor * spec;
-
-	*/
+	
 
     vec4 texture_color = texture(u_texture, v_uv);
+
+	// Si se quiere ver con el Blinn-Phong hay que cambiar el u_specular por un uspecular
 
     vec3 final_color = texture_color.xyz * u_ambient + texture_color.xyz * u_diffuse * NdotL + texture_color.xyz * u_specular * pow(RdotE, u_shininess);
     fragColor =  vec4(final_color, 1.0);
